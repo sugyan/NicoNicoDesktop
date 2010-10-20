@@ -9,10 +9,10 @@ use Encode 'encode_utf8';
 use Config::Pit;
 
 my $conf = pit_get('twitter.com', require => {
-  consumer_key    => 'consumer_key',
-  consumer_secret => 'consumer_secret',
-  token           => 'token',
-  token_secret    => 'token_secret',
+    consumer_key    => 'consumer_key',
+    consumer_secret => 'consumer_secret',
+    token           => 'token',
+    token_secret    => 'token_secret',
 });
 
 my $cv = AE::cv;
@@ -20,9 +20,7 @@ my $cv = AE::cv;
 tcp_connect '127.0.0.1', 25250, sub {
     my ($fh) = @_ or die;
 
-    warn "connect";
     my $hdl; $hdl = AnyEvent::Handle->new(fh => $fh);
-
     my $listener; $listener = AnyEvent::Twitter::Stream->new(
         %$conf,
         method => 'userstream',
