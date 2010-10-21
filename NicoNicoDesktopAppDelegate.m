@@ -45,8 +45,8 @@
 
 - (void)displayString:(NSString *)str {
     NSScreen *screen = [NSScreen mainScreen];
-    double height    = [screen frame].size.height * rand() / RAND_MAX;
-    CGRect rect      = CGRectMake([screen frame].size.width, height, [screen frame].size.width, 50.0);
+    double height    = ([screen frame].size.height - 60.0) * rand() / RAND_MAX;
+    CGRect rect      = CGRectMake([screen frame].size.width, height, [screen frame].size.width, 60.0);
     NSWindow *window =
         [[NSWindow alloc] initWithContentRect:NSRectFromCGRect(rect)
                                     styleMask:NSTexturedBackgroundWindowMask
