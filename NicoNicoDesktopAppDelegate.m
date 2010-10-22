@@ -44,36 +44,44 @@
 }
 
 - (void)displayString:(NSString *)str {
-    NSScreen *screen = [NSScreen mainScreen];
-    double height    = ([screen frame].size.height - 60.0) * rand() / RAND_MAX;
-    CGRect rect      = CGRectMake([screen frame].size.width, height, [screen frame].size.width, 60.0);
-    NSWindow *window =
-        [[NSWindow alloc] initWithContentRect:NSRectFromCGRect(rect)
-                                    styleMask:NSTexturedBackgroundWindowMask
-                                      backing:NSBackingStoreRetained
-                                        defer:YES];
-    NSText *text = [[[NSText alloc] initWithFrame:NSRectFromCGRect(CGRectMake(0.0, 0.0, rect.size.width, rect.size.height))] autorelease];
+    // screen size
+    NSRect screenRect = [[NSScreen mainScreen] frame];
+
+    // font size = 20
+    NSFont       *font       = [NSFont systemFontOfSize:20.0];
+    NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName, nil];
+    NSSize       strSize     = [str sizeWithAttributes:attributes];
+
+    NSLog(@"size: %f, %f", strSize.width, strSize.height);
+
+    // 描画開始位置(右端から、ランダムな高さで)
+    double origin_y = (screenRect.size.height - strSize.height) * rand() / RAND_MAX;
+    CGRect rect     = CGRectMake(screenRect.size.width, origin_y, strSize.width + 10.0, strSize.height + 10.0);
+    NSWindow *window = [[NSWindow alloc] initWithContentRect:NSRectFromCGRect(rect)
+                                                   styleMask:NSBorderlessWindowMask
+                                                     backing:NSBackingStoreRetained
+                                                       defer:YES];
+    [window setIgnoresMouseEvents:YES];               // mouse eventを無視
+    [window setBackgroundColor:[NSColor clearColor]]; // 透明windowに
+    [window setOpaque:NO];                            // 透過させる
+    [window setLevel:NSScreenSaverWindowLevel];       // 常に最前面に表示
+    [window orderFront:nil];
+
+    NSText  *text   = [[[NSText alloc] initWithFrame:NSRectFromCGRect(CGRectMake(0.0, 0.0, rect.size.width, rect.size.height))] autorelease];
     NSArray *colors = [NSArray arrayWithObjects:
                                [NSColor redColor],       [NSColor greenColor],    [NSColor blueColor],
                                [NSColor cyanColor],      [NSColor magentaColor],  [NSColor yellowColor],
-                               [NSColor lightGrayColor], [NSColor darkGrayColor], [NSColor grayColor],
                                [NSColor brownColor],     [NSColor orangeColor],   [NSColor purpleColor],
-                               [NSColor blackColor],     [NSColor whiteColor], nil];
-    [text setHorizontallyResizable:YES];
-    [text setString:str];
+                               [NSColor blackColor],     [NSColor whiteColor],    nil];
     [text setTextColor:[colors objectAtIndex:rand() % [colors count]]];
-    [text setFont:[NSFont systemFontOfSize:20.0]];
+    [text setString:str];
+    [text setFont:font];
     [text setBackgroundColor:[NSColor clearColor]];
     [[window contentView] addSubview:text];
 
-    [window setLevel:NSScreenSaverWindowLevel];
-    [window setBackgroundColor:[NSColor clearColor]];
-    [window setOpaque:NO];
-    [window orderFront:nil];
-
     NSRect srcViewFrame = NSRectFromCGRect(rect);
     NSRect desViewFrame = srcViewFrame;
-    desViewFrame.origin.x = -[screen frame].size.width;
+    desViewFrame.origin.x = - rect.size.width;
     NSDictionary* viewDict = [NSDictionary dictionaryWithObjectsAndKeys:
         window, NSViewAnimationTargetKey,
         [NSValue valueWithRect:srcViewFrame], NSViewAnimationStartFrameKey,
@@ -82,8 +90,9 @@
     NSViewAnimation *animation =
         [[[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:viewDict, nil]] autorelease];
  
-    [animation setDuration:[screen frame].size.width / 75.0];
+    [animation setAnimationBlockingMode:NSAnimationNonblocking];
     [animation setAnimationCurve:NSAnimationLinear];
+    [animation setDuration:screenRect.size.width / 100.0];
     [animation setDelegate:self];
     [animation startAnimation];
 }

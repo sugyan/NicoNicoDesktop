@@ -28,8 +28,11 @@ tcp_connect '127.0.0.1', 25250, sub {
             my $tweet = shift;
             scalar $listener;
             return unless ($tweet->{text} && $tweet->{user}{screen_name});
-            $hdl->push_write(encode_utf8 "$tweet->{text} - \@$tweet->{user}{screen_name}\n");
+
+            $tweet->{text} =~ s/\n/ /g;
+            $hdl->push_write(encode_utf8 "\@$tweet->{user}{screen_name}: $tweet->{text}\n");
         },
+        on_error => sub { $cv->send },
     );
 };
 $cv->recv;
