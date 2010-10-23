@@ -13,6 +13,11 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     srand(time(NULL));
 
+    NSStatusItem *theItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength] retain];
+    [theItem setImage:[NSImage imageNamed:@"menu"]];
+    [theItem setHighlightMode:YES];
+    [theItem setMenu:statusBarMenu];
+
     TCPServer *server = [[TCPServer alloc] init];
     [server setPort:25250];
     [server setDelegate:self];
@@ -102,6 +107,10 @@
         NSWindow *window = [dict objectForKey:NSViewAnimationTargetKey];
         [window close];
     }
+}
+
+- (IBAction)quit:(id)sender {
+    [[NSApplication sharedApplication] terminate:self];
 }
 
 @end

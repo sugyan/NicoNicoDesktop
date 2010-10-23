@@ -8,8 +8,10 @@
 #import <Cocoa/Cocoa.h>
 
 @interface NicoNicoDesktopAppDelegate : NSObject <NSApplicationDelegate, NSStreamDelegate, NSAnimationDelegate> {
+    IBOutlet NSMenu *statusBarMenu;
 }
 
 - (void)displayString:(NSString *)str;
+- (IBAction)quit:(id)sender;
 
 @end
